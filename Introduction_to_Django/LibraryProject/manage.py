@@ -20,3 +20,23 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
+    
+    from django.db import models
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=100)
+    publication_year = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.title} by {self.author} ({self.publication_year})"
+    
+    book = 'Book'.objects.create(title="1984", author="George Orwell", publication_year=1949)
+'book'
+
+Book.objects.all()
+
+Book.title = "Nineteen Eighty-Four"
+Book.save()
+Book
