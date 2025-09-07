@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from .models import Book, Library
+from django.shortcuts import render, get_object_or_404
+from .models import Library
 
 
 # Function-based view to list all books
@@ -45,3 +47,8 @@ class CustomLogoutView(LogoutView):
 # Homepage redirect to book list
 def home(request):
     return redirect("list_books")
+
+
+def library_detail(request, pk):
+    library = get_object_or_404(Library, pk=pk)
+    return render(request, "relationship_app/library_detail.html", {"library": library})
