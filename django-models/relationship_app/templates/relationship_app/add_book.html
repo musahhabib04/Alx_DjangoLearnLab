@@ -6,3 +6,16 @@
   <input type="date" name="published_date"><br>
   <button type="submit">Add Book</button>
 </form>
+
+{% extends "relationship_app/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Add a New Book</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Add Book</button>
+        <a href="{% url 'list_books' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

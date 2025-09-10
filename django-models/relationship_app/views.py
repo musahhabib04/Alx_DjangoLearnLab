@@ -1,15 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.decorators import user_passes_test
-from .models import Library, Book
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import permission_required
-from .models import Book
-from .models import Library
+from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
+from .models import Library, Book
 
 
 # Function-based view to list all books
@@ -25,10 +21,12 @@ class LibraryDetailView(DetailView):
     context_object_name = "library"
 
 
-# Registration view
+# Homepage redirect to book list
 def home(request):
-    return HttpResponse("Welcome to the Django Models Project 🚀")
+    return redirect("list_books")
 
+
+# Registration view
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -51,11 +49,7 @@ class CustomLogoutView(LogoutView):
     template_name = "relationship_app/logout.html"
 
 
-# Homepage redirect to book list
-def home(request):
-    return redirect("list_books")
-
-
+# Library views
 def library_detail(request, pk):
     library = get_object_or_404(Library, pk=pk)
     return render(request, "relationship_app/library_detail.html", {"library": library})
@@ -66,17 +60,17 @@ def library_list(request):
     return render(request, "relationship_app/library_list.html", {"libraries": libraries})
 
 
-
 # Role check helpers
 def is_admin(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
 
+
 def is_librarian(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
 
+
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
-
 
 
 # Add Book
@@ -87,8 +81,8 @@ def add_book(request):
         author = request.POST.get("author")
         published_date = request.POST.get("published_date")
         Book.objects.create(title=title, author=author, published_date=published_date)
-        return redirect("book_list")
-    return render(request, "add_book.html")
+        return redirect("list_books")
+    return render(request, "relationship_app/add_book.html")
 
 
 # Edit Book
@@ -100,8 +94,8 @@ def edit_book(request, book_id):
         book.author = request.POST.get("author")
         book.published_date = request.POST.get("published_date")
         book.save()
-        return redirect("book_list")
-    return render(request, "edit_book.html", {"book": book})
+        return redirect("list_books")
+    return render(request, "relationship_app/edit_book.html", {"book": book})
 
 
 # Delete Book
@@ -110,11 +104,11 @@ def delete_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     if request.method == "POST":
         book.delete()
-        return redirect("book_list")
-    return render(request, "delete_book.html", {"book": book})
+        return redirect("list_books")
+    return render(request, "relationship_app/delete_book.html", {"book": book})
 
 
-# Views
+# Role-based views
 @user_passes_test(is_admin)
 def admin_view(request):
     return render(request, "relationship_app/admin_view.html")
@@ -128,4 +122,3 @@ def librarian_view(request):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, "relationship_app/member_view.html")
-

@@ -1,0 +1,14 @@
+{% extends "relationship_app/base.html" %}
+
+{% block title %}Libraries{% endblock %}
+
+{% block content %}
+<h1>Libraries</h1>
+<ul>
+    {% for library in libraries %}
+        <li>
+            <a href="{% url 'library_detail' library.pk %}">{{ library.name }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

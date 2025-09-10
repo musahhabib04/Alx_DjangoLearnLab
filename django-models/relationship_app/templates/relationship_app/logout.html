@@ -8,3 +8,12 @@
     <a href="{% url 'login' %}">Login again</a>
 </body>
 </html>
+
+{% extends "relationship_app/base.html" %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+<h1>You have been logged out.</h1>
+<a href="{% url 'login' %}">Login again</a>
+{% endblock %}
