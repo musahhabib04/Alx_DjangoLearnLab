@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView
+from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from .models import Book, Library
+from .models import Book, Library # type: ignore
 from django.shortcuts import render, get_object_or_404
 from .models import Library
 
@@ -52,6 +52,11 @@ def home(request):
 def library_detail(request, pk):
     library = get_object_or_404(Library, pk=pk)
     return render(request, "relationship_app/library_detail.html", {"library": library})
+
+
+def library_list(request):
+    libraries = Library.objects.all()
+    return render(request, "relationship_app/library_list.html", {"libraries": libraries})
 
 
 from django.shortcuts import render
