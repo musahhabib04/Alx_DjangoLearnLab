@@ -3,20 +3,9 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-# -------------------------------------------------------------------
-# ROLE CHOICES (Global)
-# -------------------------------------------------------------------
-ROLE_CHOICES = [
-    ("Admin", "Admin"),
-    ("Librarian", "Librarian"),
-    ("Member", "Member"),
-]
 
-# -------------------------------------------------------------------
-# Core Models
-# -------------------------------------------------------------------
 class Author(models.Model):
-    """Represents a book author."""
+    """Model representing an author."""
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -24,71 +13,56 @@ class Author(models.Model):
 
 
 class Library(models.Model):
-    """Represents a library branch or location."""
+    """Model representing a library."""
     name = models.CharField(max_length=100)
-    location = models.CharField(max_length=200, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+
 
     def __str__(self):
         return self.name
 
 
 class Book(models.Model):
-    """Represents a book stored in a library."""
+    """Model representing a book."""
     title = models.CharField(max_length=200)
-    published_date = models.DateField(null=True, blank=True)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    library = models.ForeignKey(
-        Library,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="books"
-    )
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="books")
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name="books", null=True, blank=True)
+
 
     def __str__(self):
         return self.title
 
 
 class Librarian(models.Model):
-    """Represents a librarian responsible for one library."""
+    """Model representing a librarian."""
     name = models.CharField(max_length=100)
-    library = models.OneToOneField(Library, on_delete=models.CASCADE)
+    library = models.OneToOneField(
+        Library, on_delete=models.CASCADE, related_name="librarian"
+    )
 
     def __str__(self):
         return self.name
 
-# -------------------------------------------------------------------
-# User Profile Model (Extends Django User)
-# -------------------------------------------------------------------
+
 class UserProfile(models.Model):
-    """Extends the default User model with a role and custom permissions."""
+    """Extended user profile with roles and custom permissions."""
+    ROLE_CHOICES = [
+        ("Admin", "Admin"),
+        ("Librarian", "Librarian"),
+        ("Member", "Member"),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default="Member"
-    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Member")
 
     class Meta:
-        verbose_name = "User Profile"
-        verbose_name_plural = "User Profiles"
         permissions = [
             ("can_add_book", "Can add book"),
-            ("can_change_book", "Can change book"),
+            ("can_edit_book", "Can edit book"),
             ("can_delete_book", "Can delete book"),
         ]
+        verbose_name = "User Profile"
+        verbose_name_plural = "User Profiles"
 
     def __str__(self):
-        return f"{self.user.username} ({self.role})"
-
-# -------------------------------------------------------------------
-# Signals to Auto-Create & Save User Profiles
-# -------------------------------------------------------------------
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
+        return f"{self.user.username} - {self.role}"
