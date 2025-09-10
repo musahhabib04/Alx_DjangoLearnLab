@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import user_passes_test
 from .models import Library, Book
 from django.shortcuts import render, get_object_or_404
 from .models import Library
+from django.http import HttpResponse
 
 
 # Function-based view to list all books
@@ -23,6 +24,9 @@ class LibraryDetailView(DetailView):
 
 
 # Registration view
+def home(request):
+    return HttpResponse("Welcome to the Django Models Project 🚀")
+
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
