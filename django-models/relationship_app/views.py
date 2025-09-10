@@ -6,6 +6,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.decorators import user_passes_test
 from .models import Library, Book
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import permission_required
+from .models import Book
 from .models import Library
 from django.http import HttpResponse
 
@@ -64,8 +66,6 @@ def library_list(request):
     return render(request, "relationship_app/library_list.html", {"libraries": libraries})
 
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import user_passes_test
 
 # Role check helpers
 def is_admin(user):
@@ -76,6 +76,42 @@ def is_librarian(user):
 
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
+
+
+
+# Add Book
+@permission_required('relationship_app.can_add_book')
+def add_book(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        author = request.POST.get("author")
+        published_date = request.POST.get("published_date")
+        Book.objects.create(title=title, author=author, published_date=published_date)
+        return redirect("book_list")
+    return render(request, "add_book.html")
+
+
+# Edit Book
+@permission_required('relationship_app.can_change_book')
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == "POST":
+        book.title = request.POST.get("title")
+        book.author = request.POST.get("author")
+        book.published_date = request.POST.get("published_date")
+        book.save()
+        return redirect("book_list")
+    return render(request, "edit_book.html", {"book": book})
+
+
+# Delete Book
+@permission_required('relationship_app.can_delete_book')
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == "POST":
+        book.delete()
+        return redirect("book_list")
+    return render(request, "delete_book.html", {"book": book})
 
 
 # Views
