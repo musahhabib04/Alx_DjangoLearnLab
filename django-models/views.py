@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from .models import Book, Library # type: ignore
+from .models import Library, Book
 from django.shortcuts import render, get_object_or_404
 from .models import Library
 
