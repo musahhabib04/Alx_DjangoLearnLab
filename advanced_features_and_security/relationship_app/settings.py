@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'relationship_app',
-    
+    'bookshelf',
 ]
 
 MIDDLEWARE = [
@@ -70,9 +70,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_models.wsgi.application'
-
-
-AUTH_USER_MODEL = "relationship_app.CustomUser"
 
 
 # Database
