@@ -71,6 +71,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_models.wsgi.application'
 
+AUTH_USER_MODEL = "bookshelf.CustomUser"
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
