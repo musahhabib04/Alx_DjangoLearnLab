@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required
 from .models import Book
 from django import forms
+from .forms import BookSearchForm, BookForm, ExampleForm 
 
 
 @permission_required('bookshelf.can_view', raise_exception=True)
@@ -54,5 +55,7 @@ def search_books(request):
         # ORM prevents SQL injection
         books = Book.objects.filter(title__icontains=query)
     return render(request, "bookshelf/book_list.html", {"books": books, "form": form})
+
+
 
 # Create your views here.
