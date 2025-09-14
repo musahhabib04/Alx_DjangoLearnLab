@@ -120,6 +120,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Redirect all HTTP → HTTPS
 SECURE_SSL_REDIRECT = True
 
+# Trust X-Forwarded-Proto header set by your proxy (e.g., Nginx, Heroku, etc.)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # Enforce HSTS (HTTP Strict Transport Security)
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
