@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Books List</title>
+</head>
+<body>
+    <h1>Books Available</h1>
+    <ul>
+        {% for book in books %}
+            <li>{{ book.title }} by {{ book.author }}</li>
+        {% empty %}
+            <li>No books available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+{% extends "relationship_app/base.html" %}
+
+{% block title %}Books{% endblock %}
+
+{% block content %}
+<h1>Books</h1>
+{% if books %}
+    <ul>
+        {% for book in books %}
+            <li>{{ book.title }} ({{ book.author }})</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No books available.</p>
+{% endif %}
+{% endblock %}
