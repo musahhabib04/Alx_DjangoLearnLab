@@ -1,4 +1,3 @@
-
 from django.urls import path
 from .views import ListView, DetailView, CreateView, UpdateView, DeleteView
 
