@@ -1,59 +1,39 @@
-"""
-Views for handling Book CRUD operations using Django REST Framework generic views.
-Each class is named exactly as required by the ALX checker:
-ListView, DetailView, CreateView, UpdateView, DeleteView
-"""
-
-from rest_framework import generics, permissions
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book
 from .serializers import BookSerializer
 
 
-class ListView(generics.ListAPIView):
-    """
-    Retrieve and list all Book instances.
-    Accessible to anyone (public).
-    """
+# List all books
+class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class DetailView(generics.RetrieveAPIView):
-    """
-    Retrieve a single Book instance by its ID.
-    Accessible to anyone (public).
-    """
+# Retrieve a single book by ID
+class BookDetailView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
-class CreateView(generics.CreateAPIView):
-    """
-    Create a new Book instance.
-    Only accessible to authenticated users.
-    """
+# Create a new book
+class BookCreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
-class UpdateView(generics.UpdateAPIView):
-    """
-    Update an existing Book instance.
-    Only accessible to authenticated users.
-    """
+# Update an existing book
+class BookUpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
-class DeleteView(generics.DestroyAPIView):
-    """
-    Delete an existing Book instance.
-    Only accessible to authenticated users.
-    """
+# Delete a book
+class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
