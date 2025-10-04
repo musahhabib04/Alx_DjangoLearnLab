@@ -5,7 +5,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm
 
-
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -21,7 +20,5 @@ def register_view(request):
 def profile_view(request):
     return render(request, 'blog/profile.html')
 
-def home(request):
-    return render(request, "blog/home.html")
 
 # Create your views here.
