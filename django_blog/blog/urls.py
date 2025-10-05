@@ -1,9 +1,19 @@
+# blog/urls.py
 from django.urls import path
-from . import views
+from .views import (
+    PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
+    CommentCreateView, CommentUpdateView, CommentDeleteView,
+)
 
 urlpatterns = [
-    path('', views.home, name='blog-home'),
-    path('post/new/', views.post_create, name='post-create'),
-    path('post/<int:pk>/update/', views.post_update, name='post-update'),
-    path('post/<int:pk>/delete/', views.post_delete, name='post-delete'),
+    path('posts/', PostListView.as_view(), name='post-list'),
+    path('posts/new/', PostCreateView.as_view(), name='post-create'),
+    path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
+    path('posts/<int:pk>/edit/', PostUpdateView.as_view(), name='post-update'),
+    path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
+
+    # Comments: create uses post_id, update/delete use comment pk
+    path('posts/<int:post_id>/comments/new/', CommentCreateView.as_view(), name='comment-create'),
+    path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment-update'),
+    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
 ]
