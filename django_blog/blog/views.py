@@ -4,6 +4,14 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
+from django.db.models import Q
+from .models import Post
 
 
 def home(request):
@@ -21,15 +29,17 @@ def post_delete(request, pk):
     # placeholder view
     return render(request, 'blog/post_confirm_delete.html')
 
+def search_posts(request):
+    query = request.GET.get('q')
+    results = Post.objects.filter(
+        Q(title__icontains=query) | 
+        Q(content__icontains=query) | 
+        Q(tags__name__icontains=query)
+    ).distinct()
+    return render(request, 'blog/search_results.html', {'posts': results, 'query': query})
 
 
-# blog/views.py
-from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post, Comment
-from .forms import PostForm, CommentForm
+
 # Public listing of posts
 
 class PostListView(ListView):
