@@ -94,7 +94,7 @@ REST_FRAMEWORK = {
 
 
 
-AUTH_USER_MODEL = 'accounts.User'
+#AUTH_USER_MODEL = 'accounts.User'
 
 
 # Database
