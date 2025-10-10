@@ -7,22 +7,36 @@ from rest_framework.decorators import api_view, permission_classes
 from .serializers import RegisterSerializer, ProfileSerializer, UserSerializer
 
 
-User = get_user_model()
+CustomUser = get_user_model()
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+class RegisterView(generics.GenericAPIView):
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": token.key
+        })
+        
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
-        user = User.objects.get(id=token.user_id)
-        return Response({'token': token.key, 'username': user.username})
+        return Response({
+            'token': token.key,
+            'user_id': token.user_id,
+            'username': token.user.username
+        })
+
 
 class ProfileView(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
+    serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'pk'
 
@@ -34,21 +48,21 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 @permission_classes([permissions.IsAuthenticated])
 def follow_user(request, user_id):
     try:
-        to_follow = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
+        user_to_follow = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
         return Response({'detail':'User not found'}, status=status.HTTP_404_NOT_FOUND)
-    if to_follow == request.user:
+    if user_to_follow == request.user:
         return Response({'detail': "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-    request.user.following.add(to_follow)
-    return Response({'detail': f'You are now following {to_follow.username}.'}, status=status.HTTP_200_OK)
+    request.user.following.add(user_to_follow)
+    return Response({'detail': f'You are now following {user_to_follow.username}.'}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def unfollow_user(request, user_id):
     try:
-        to_unfollow = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
+        to_unfollow = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
         return Response({'detail':'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
     request.user.following.remove(to_unfollow)
