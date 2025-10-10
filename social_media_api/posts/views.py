@@ -7,7 +7,7 @@ from .serializers import PostSerializer
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status, permissions
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, Post
 from .models import Post, Like
 from notifications.models import Notification
 from .serializers import PostSerializer, CommentSerializer
@@ -22,10 +22,11 @@ def feed(request):
     user = request.user
     following_users = user.following.all()  # users the current user follows
     posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+    post = generics.get_object_or_404(Post, pk=pk)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
-
+    
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all() 
     serializer_class = PostSerializer
