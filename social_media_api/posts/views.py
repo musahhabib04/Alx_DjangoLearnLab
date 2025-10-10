@@ -1,11 +1,21 @@
-from rest_framework import viewsets, permissions
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
-from rest_framework import viewsets, permissions, generics
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
-from .serializers import PostSerializer
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth import get_user_model
 from .models import Post
+from .serializers import PostSerializer
+
+User = get_user_model()
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def feed(request):
+    user = request.user
+    following_users = user.following.all()  # users the current user follows
+    posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
