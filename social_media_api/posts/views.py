@@ -22,11 +22,41 @@ def feed(request):
     user = request.user
     following_users = user.following.all()  # users the current user follows
     posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
-    post = generics.get_object_or_404(Post, pk=pk)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
 
-    
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def like_post(request, pk):
+    # safely get the post or return 404
+    post = generics.get_object_or_404(Post, pk=pk)
+
+    # this is the line you’re missing
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+    if not created:
+        return Response({"message": "You already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"message": "Post liked successfully!"}, status=status.HTTP_201_CREATED)
+
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unlike_post(request, pk):
+    post = generics.get_object_or_404(Post, pk=pk)
+    try:
+        like = Like.objects.get(user=request.user, post=post)
+        like.delete()
+        return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
+    except Like.DoesNotExist:
+        return Response({"message": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all() 
     serializer_class = PostSerializer
